@@ -37,20 +37,35 @@ namespace VehicleServiceBookingApplication.Controllers
 
         // GET: api/ServiceBookings/5
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<ServiceBookings>> GetServiceBookings(int id)
         {
-          if (_context.ServiceBookings == null)
-          {
-              return NotFound();
-          }
-            var serviceBookings = await _context.ServiceBookings.FindAsync(id);
+            //if (_context.ServiceBookings == null)
+            //{
+            //    return NotFound();
+            //}
+            //  var serviceBookings = await _context.ServiceBookings.FindAsync(id);
 
-            if (serviceBookings == null)
+            //  if (serviceBookings == null)
+            //  {
+            //      return NotFound();
+            //  }
+
+            //  return serviceBookings;
+
+            var booking = await _context.ServiceBookings
+                .Include(s => s.User)
+                .Include(s => s.Store)
+                .Include(s => s.ServiceType)
+                .Include(s => s.Status)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
+
+            if (booking == null)
             {
                 return NotFound();
             }
 
-            return serviceBookings;
+            return Ok(booking);
         }
 
         // PUT: api/ServiceBookings/5
